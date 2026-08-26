@@ -1,0 +1,22 @@
+{
+  "name": "ct-usage-overview",
+  "version": "1.0.0",
+  "description": "在 Codex 一级侧栏顶部显示通用限额，悬停查看完整用量与重置卡，点击打开用量设置。",
+  "keywords": ["codex-tweaks-package", "codex-tweaks-workflow"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codex-tweaks/codex-tweaks-usage-overview.git"
+  },
+  "homepage": "https://github.com/codex-tweaks/codex-tweaks-usage-overview",
+  "type": "module",
+  "dependencies": {},
+  "codexTweaks": {
+    "apiVersion": 3,
+    "entrypoints": {
+      "renderer": "src/index.js"
+    },
+    "priority": 50,
+    "packageDependencies": {}
+  }
+}

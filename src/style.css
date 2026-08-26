@@ -1,0 +1,146 @@
+/* Codex 一级侧栏顶部：通用用量摘要，以及完整用量悬停详情。 */
+html[data-codex-tweaks-usage-overview-active]
+  [data-codex-tweaks-usage-overview] {
+  -webkit-app-region: no-drag;
+  position: relative;
+  z-index: 20;
+  isolation: isolate;
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: flex-end;
+  min-inline-size: 0;
+  max-inline-size: 145px;
+  block-size: 32px;
+  box-sizing: border-box;
+  margin-inline: 2px 4px;
+  padding-block: 2px;
+  padding-inline: 0;
+  border: 0;
+  overflow: visible;
+  color: var(--color-token-text-secondary, var(--color-text-secondary));
+  font: inherit;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+  text-align: end;
+  white-space: nowrap;
+  cursor: pointer;
+  background: transparent;
+  pointer-events: auto;
+  user-select: none;
+}
+
+html[data-codex-tweaks-usage-overview-active]
+  [data-codex-tweaks-usage-overview]:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+
+html[data-codex-tweaks-usage-overview-active]
+  [data-codex-tweaks-usage-overview-value] {
+  color: var(--color-token-text-primary, var(--color-text-foreground));
+  font-weight: 600;
+}
+
+html[data-codex-tweaks-usage-overview-active]
+  [data-codex-tweaks-usage-overview-tooltip] {
+  position: fixed;
+  z-index: 10000;
+  inset: auto;
+  display: grid;
+  inline-size: 220px;
+  max-inline-size: calc(100vw - 24px);
+  max-block-size: calc(100vh - 100px);
+  box-sizing: border-box;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 0.5px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-token-text-primary, var(--color-text-foreground));
+  background: var(
+    --color-background-elevated-primary-opaque,
+    var(--color-background-surface)
+  );
+  box-shadow:
+    0 4px 12px rgb(0 0 0 / 10%),
+    0 1px 3px rgb(0 0 0 / 6%);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.35;
+  text-align: start;
+  white-space: normal;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-2px);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease,
+    visibility 0s linear 120ms;
+}
+
+html[data-codex-tweaks-usage-overview-active]
+  [data-codex-tweaks-usage-overview-tooltip][data-visible] {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0s;
+}
+
+html[data-codex-tweaks-usage-overview-active]
+  [data-codex-tweaks-usage-overview-tooltip-header] {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+html[data-codex-tweaks-usage-overview-active]
+  [data-codex-tweaks-usage-overview-tooltip-title] {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+html[data-codex-tweaks-usage-overview-active]
+  [data-codex-tweaks-usage-overview-tooltip-updated] {
+  color: var(--color-token-text-secondary, var(--color-text-secondary));
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+html[data-codex-tweaks-usage-overview-active]
+  [data-codex-tweaks-usage-overview-tooltip-group] {
+  display: grid;
+  gap: 6px;
+  padding-block-start: 9px;
+  border-block-start: 0.5px solid var(--color-border);
+}
+
+html[data-codex-tweaks-usage-overview-active]
+  [data-codex-tweaks-usage-overview-tooltip-group-title] {
+  color: var(--color-token-text-secondary, var(--color-text-secondary));
+  font-size: 11px;
+  font-weight: 600;
+}
+
+html[data-codex-tweaks-usage-overview-active]
+  [data-codex-tweaks-usage-overview-tooltip-row] {
+  display: grid;
+  gap: 2px;
+}
+
+html[data-codex-tweaks-usage-overview-active]
+  [data-codex-tweaks-usage-overview-tooltip-reset] {
+  color: var(--color-token-text-secondary, var(--color-text-secondary));
+  font-size: 11px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-codex-tweaks-usage-overview-active]
+    [data-codex-tweaks-usage-overview-tooltip] {
+    transform: none;
+    transition: none;
+  }
+}
