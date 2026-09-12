@@ -1,6 +1,10 @@
 [tools]
 node = "24.16.0"
 
+[tasks.install]
+description = "按锁文件安装本地依赖"
+run = "npm ci --ignore-scripts --no-audit --no-fund"
+
 [tasks.check]
 description = "检查脚本语法和补丁格式"
-run = ["node --check src/index.js", "git diff --check"]
+run = ["node --check src/index.js", "node --check src/tooltip-glass.js", "git diff --check"]

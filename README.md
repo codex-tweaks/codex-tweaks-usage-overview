@@ -6,6 +6,7 @@
 
 - 在侧栏持续展示主要用量信息
 - 悬停查看完整限额和重置时间
+- 液态玻璃悬浮卡，支持明暗主题与降低透明度偏好
 - 记录并显示本地重置额度信息
 
 ## 安装
@@ -23,10 +24,13 @@
 - Codex Tweaks API：v3
 - 已测试平台：macOS
 - 已知限制：依赖 Codex 用量状态和一级侧栏的内部结构
+- 玻璃折射依赖 Chromium 的滤镜支持；开启降低透明度或高对比度模式时使用实色背景
 
 ## 开发
 
-此包没有 npm 依赖。使用 `mise run check` 检查脚本语法和补丁格式。修改源码后，在 Codex Tweaks 中重新编译，并验证侧栏、悬停卡、明暗主题、设置导航以及停用清理。
+使用 `mise run install` 安装锁定的依赖，`mise run check` 检查脚本语法和补丁格式。修改源码后，在 Codex Tweaks 中重新编译，并验证侧栏、悬停卡、明暗主题、设置导航以及停用清理。
+
+液态玻璃使用 [liquid-glass-react](https://github.com/rdev/liquid-glass-react)。React 和玻璃组件随包本地编译，运行时不从 CDN 加载。
 
 ## 致谢
 

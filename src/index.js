@@ -1,4 +1,5 @@
 import "./style.css";
+import { mountTooltipGlass } from "./tooltip-glass.js";
 
 export function activate({ api, id, root }) {
   // 只读取 Codex 已经维护的用量 Query Cache，不自行请求账号接口。
@@ -44,6 +45,7 @@ export function activate({ api, id, root }) {
   let syncQueued = false;
   let activeWidget = null;
   let activeTooltip = null;
+  let tooltipGlass = null;
   let detachWidgetListeners = null;
   let cancelPendingNavigation = null;
   let navigationInProgress = false;
@@ -568,11 +570,15 @@ export function activate({ api, id, root }) {
     activeTooltip.style.top = `${Math.round(top)}px`;
   }
 
-  function showTooltip() {
+  async function showTooltip() {
     tooltipRequested = true;
-    if (!activeTooltip?.isConnected) return;
+    const tooltip = activeTooltip;
+    if (!tooltip?.isConnected) return;
+    tooltipGlass ??= mountTooltipGlass(tooltip, activeWidget);
+    await tooltipGlass.ready;
+    if (disposed || !tooltipRequested || activeTooltip !== tooltip) return;
     positionTooltip();
-    activeTooltip.setAttribute("data-visible", "");
+    tooltip.setAttribute("data-visible", "");
   }
 
   function hideTooltip() {
@@ -581,6 +587,8 @@ export function activate({ api, id, root }) {
   }
 
   function disposeTooltip() {
+    tooltipGlass?.cleanup();
+    tooltipGlass = null;
     activeTooltip?.remove();
     activeTooltip = null;
   }
@@ -833,7 +841,7 @@ export function activate({ api, id, root }) {
 
     activeTooltip = tooltip;
     document.body.append(tooltip);
-    if (tooltipRequested) showTooltip();
+    tooltipGlass = mountTooltipGlass(tooltip, activeWidget);
 
     activeWidget.setAttribute(
       "aria-label",
@@ -842,6 +850,7 @@ export function activate({ api, id, root }) {
     activeWidget.setAttribute("aria-describedby", TOOLTIP_ID);
     activeWidget.tabIndex = 0;
     activeWidget.append(value);
+    if (tooltipRequested) showTooltip();
   }
 
   function disposeWidget() {
