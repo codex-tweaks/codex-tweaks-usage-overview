@@ -59,9 +59,10 @@ html[data-codex-tweaks-usage-overview-active]
   border: 0.5px solid var(--color-border);
   border-radius: 10px;
   color: var(--color-token-text-primary, var(--color-text-foreground));
+  /* 新版使用 app 前缀；兜底也保持不透明，避免继承壁纸插件的半透明 surface。 */
   background: var(
-    --color-background-elevated-primary-opaque,
-    var(--color-background-surface)
+    --app-color-background-elevated-primary-opaque,
+    var(--color-background-elevated-primary-opaque, light-dark(#fff, #282828))
   );
   box-shadow:
     0 4px 12px rgb(0 0 0 / 10%),
