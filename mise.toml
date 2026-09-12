@@ -1,0 +1,6 @@
+[tools]
+node = "24.16.0"
+
+[tasks.check]
+description = "检查脚本语法和补丁格式"
+run = ["node --check src/index.js", "git diff --check"]
