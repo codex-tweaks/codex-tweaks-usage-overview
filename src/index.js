@@ -63,35 +63,43 @@ export function activate({ api, id, root }) {
     return rect.width > 0 && rect.height > 0;
   }
 
+  function getButtonMode(button) {
+    // 字标 SVG 的 title 与屏幕阅读器文本都会进入 textContent。
+    const label = button.getAttribute("aria-label") ?? "";
+    const mode = label.match(/(?:[：:]\s*)(Codex|ChatGPT)\s*$/)?.[1];
+    if (mode) return mode;
+    const text = button.textContent.trim();
+    return text === "Codex" || text === "ChatGPT" ? text : null;
+  }
+
   function getModeButton() {
     return (
-      [...document.querySelectorAll('button[aria-haspopup="menu"]')].find(
-        (button) => {
-          if (!isVisible(button)) return false;
-          const label = button.textContent.trim();
-          return label === "Codex" || label === "ChatGPT";
-        },
+      [...document.querySelectorAll('nav[role="navigation"] button[aria-haspopup="menu"]')].find(
+        (button) => isVisible(button) && getButtonMode(button),
       ) ?? null
     );
   }
 
   function getPlacement() {
     const modeButton = getModeButton();
-    if (!modeButton || modeButton.textContent.trim() !== "Codex") return null;
-    if (!modeButton.closest('nav[role="navigation"]')) return null;
+    if (!modeButton) return null;
+    const navigation = modeButton.closest('nav[role="navigation"]');
 
-    const headerRow = modeButton.parentElement;
-    if (!(headerRow instanceof HTMLElement)) return null;
-
-    const actionsRoot = [...headerRow.children].find(
-      (element) =>
-        element !== modeButton &&
-        !element.hasAttribute(WIDGET_MARKER) &&
-        element.querySelector("button"),
-    );
-    if (!(actionsRoot instanceof HTMLElement)) return null;
-
-    return { actionsRoot, headerRow, modeButton };
+    // Tooltip 的 display:contents 包装不再与操作区同级，沿祖先找到真实行。
+    for (let headerRow = modeButton.parentElement;
+      headerRow && headerRow !== navigation;
+      headerRow = headerRow.parentElement) {
+      const actionsRoot = [...headerRow.children].find(
+        (element) =>
+          !element.contains(modeButton) &&
+          !element.hasAttribute(WIDGET_MARKER) &&
+          element.querySelector("button"),
+      );
+      if (actionsRoot instanceof HTMLElement) {
+        return { actionsRoot, headerRow };
+      }
+    }
+    return null;
   }
 
   function isQueryClient(value) {

@@ -1,6 +1,6 @@
 {
   "name": "ct-usage-overview",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "在 Codex 一级侧栏顶部显示通用限额，悬停查看完整用量与重置卡，点击打开用量设置。",
   "keywords": ["codex-tweaks-package", "codex-tweaks-workflow"],
   "license": "MIT",
