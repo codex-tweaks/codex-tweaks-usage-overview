@@ -1,5 +1,6 @@
 import "./style.css";
 import { mountTooltipGlass } from "./tooltip-glass.js";
+import { findUsageQuery, getResetCreditsQueryKey } from "./usage-query.js";
 
 export function activate({ api, id, root }) {
   // 只读取 Codex 已经维护的用量 Query Cache，不自行请求账号接口。
@@ -28,8 +29,6 @@ export function activate({ api, id, root }) {
     "data-codex-tweaks-usage-overview-tooltip-reset";
   const TOOLTIP_ID = `${id || "codex-usage-overview"}-details`;
   const FIBER_PROPERTY_PREFIXES = ["__reactFiber$", "__reactContainer$"];
-  const RATE_LIMIT_QUERY_KEY = ["rate-limit-status"];
-  const RESET_CREDITS_QUERY_KEY = ["rate-limit-reset-credits"];
   const RESET_CREDITS_STORAGE_KEY =
     "codex-tweaks:codex-usage-overview:reset-credits";
   const RESET_CREDITS_CACHE_MAX_AGE_MS = 35 * 24 * 60 * 60 * 1000;
@@ -53,12 +52,15 @@ export function activate({ api, id, root }) {
   let queryClient = null;
   let unsubscribeQueryCache = null;
   let lastRenderKey = null;
+  let lastUsageScope = null;
   let lastResetCreditsData =
     inheritedResetCreditsData ?? readPersistedResetCreditsData();
   let warnedAboutQueryData = false;
 
   function isVisible(element) {
     if (!(element instanceof Element)) return false;
+    if (element.closest('[inert], [aria-hidden="true"]')) return false;
+    if (getComputedStyle(element).visibility !== "visible") return false;
     const rect = element.getBoundingClientRect();
     return rect.width > 0 && rect.height > 0;
   }
@@ -74,7 +76,7 @@ export function activate({ api, id, root }) {
 
   function getModeButton() {
     return (
-      [...document.querySelectorAll('nav[role="navigation"] button[aria-haspopup="menu"]')].find(
+      [...document.querySelectorAll('button[aria-haspopup="menu"]')].find(
         (button) => isVisible(button) && getButtonMode(button),
       ) ?? null
     );
@@ -83,12 +85,12 @@ export function activate({ api, id, root }) {
   function getPlacement() {
     const modeButton = getModeButton();
     if (!modeButton) return null;
-    const navigation = modeButton.closest('nav[role="navigation"]');
+    const navigation = modeButton.closest("nav") ?? document.body;
 
     // Tooltip 的 display:contents 包装不再与操作区同级，沿祖先找到真实行。
-    for (let headerRow = modeButton.parentElement;
-      headerRow && headerRow !== navigation;
-      headerRow = headerRow.parentElement) {
+    for (let headerRow = modeButton.parentElement, depth = 0;
+      headerRow && headerRow !== navigation && depth < 5;
+      headerRow = headerRow.parentElement, depth += 1) {
       const actionsRoot = [...headerRow.children].find(
         (element) =>
           !element.contains(modeButton) &&
@@ -429,8 +431,17 @@ export function activate({ api, id, root }) {
     if (!client) return { state: "loading", strings };
 
     try {
-      const data = client.getQueryData(RATE_LIMIT_QUERY_KEY);
-      const queryState = client.getQueryState?.(RATE_LIMIT_QUERY_KEY);
+      const usageQuery = findUsageQuery(client);
+      const usageScope = usageQuery
+        ? JSON.stringify(usageQuery.queryKey.slice(1))
+        : null;
+      if (usageScope !== lastUsageScope) {
+        lastUsageScope = usageScope;
+        lastResetCreditsData = null;
+        clearPersistedResetCreditsData();
+      }
+      const queryState = usageQuery?.state;
+      const data = queryState?.data;
       if (!data) {
         return {
           state: queryState?.status === "error" ? "error" : "loading",
@@ -442,7 +453,9 @@ export function activate({ api, id, root }) {
       const generalWindows =
         groups.find((group) => group.id === "general")?.windows ?? [];
       const displayWindow = getDisplayWindow(generalWindows);
-      const resetCreditsData = client.getQueryData(RESET_CREDITS_QUERY_KEY);
+      const resetCreditsData = client.getQueryData(
+        getResetCreditsQueryKey(usageQuery),
+      );
       const currentResetCreditCount = Number(
         data?.rate_limit_reset_credits?.available_count,
       );
@@ -889,7 +902,7 @@ export function activate({ api, id, root }) {
       !activeWidget?.isConnected ||
       activeWidget.parentElement !== placement.headerRow
     ) {
-      activeWidget?.remove();
+      disposeWidget();
       activeWidget = createWidget();
       lastRenderKey = null;
     }
