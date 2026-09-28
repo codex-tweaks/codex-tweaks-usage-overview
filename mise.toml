@@ -7,4 +7,4 @@ run = "npm ci --ignore-scripts --no-audit --no-fund"
 
 [tasks.check]
 description = "检查脚本语法和补丁格式"
-run = ["node --check src/index.js", "node --check src/tooltip-glass.js", "git diff --check"]
+run = ["node --check src/index.js", "node --check src/tooltip-glass.js", "node --check src/usage-query.js", "git diff --check"]
